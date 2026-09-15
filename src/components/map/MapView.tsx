@@ -65,7 +65,7 @@ export class MapView extends Component<MapViewProps> {
     map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
     map.on('error', (e) => {
-      // eslint-disable-next-line no-console
+       
       console.error('[MapLibre error]', e.error?.message ?? e.error ?? e);
     });
 
