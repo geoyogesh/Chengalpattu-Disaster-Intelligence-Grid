@@ -44,8 +44,11 @@ jobs:
       - name: Verify tile sourceLayer invariant
         run: npm run verify:tiles
 
+      - name: Unit tests (Vitest)
+        run: npm run test:unit
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
-      - name: Run tests
+      - name: E2E tests (Playwright)
         run: npm test

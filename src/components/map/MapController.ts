@@ -1,6 +1,6 @@
 import maplibregl, { type Map as MapLibreMap } from 'maplibre-gl';
 
-import { GEO_LAYERS, ADMIN_ZOOM_SWITCH, type GeoLayer } from '@/data/geoLayers';
+import { GEO_LAYERS, type GeoLayer } from '@/data/geoLayers';
 import {
   LAYER_STYLES,
   defaultStyle,
@@ -9,6 +9,10 @@ import {
 } from '@/data/layerStyles';
 import { pmtilesUrl } from '@/components/map/mapSetup';
 import { BASEMAP_KEY } from '@/store/layerStore';
+import { layerBase, effectiveVisibility } from '@/components/map/mapLogic';
+
+// Re-export the pure helpers so existing importers keep working.
+export { layerBase, effectiveVisibility } from '@/components/map/mapLogic';
 
 /** Initial per-layer opacity applied at add time (overwritten by applyLayerState). */
 export const INITIAL_OPACITY = 0.85;
@@ -19,31 +23,6 @@ export const COMPANION_SUFFIXES = ['label', 'hit', 'dash', 'case', 'unmetalled']
 export interface LayerUIState {
   visible: boolean;
   opacity: number;
-}
-
-// ---------------------------------------------------------------------------
-// Pure helpers — no map instance needed, so they unit-test in isolation.
-// ---------------------------------------------------------------------------
-
-/** The shared id/source/source-layer base for a layer's MapLibre layers. */
-export function layerBase(layer: GeoLayer): LayerBase {
-  return {
-    id: `geo-${layer.id}`,
-    source: `src-${layer.id}`,
-    'source-layer': layer.sourceLayer,
-  };
-}
-
-/**
- * Effective visibility for a layer at a given zoom. Admin-group members share
- * one toggle but only one draws at a time: the district below the zoom switch,
- * the taluks at/above it. Non-admin layers just follow their own toggle.
- */
-export function effectiveVisibility(layer: GeoLayer, userVisible: boolean, zoom: number): boolean {
-  if (!layer.adminGroup) return userVisible;
-  const inDistrictBand = zoom < ADMIN_ZOOM_SWITCH;
-  const isDistrict = layer.id === 'district';
-  return userVisible && (isDistrict ? inDistrictBand : !inDistrictBand);
 }
 
 // ---------------------------------------------------------------------------

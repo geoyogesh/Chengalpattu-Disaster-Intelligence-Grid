@@ -10,9 +10,13 @@ import { Grid } from 'antd';
  */
 export type DeviceTier = 'mobile' | 'tablet' | 'desktop';
 
-export function useDeviceTier(): DeviceTier {
-  const screens = Grid.useBreakpoint();
+/** Pure tier decision from AntD breakpoint flags — unit-testable in isolation. */
+export function tierFor(screens: Partial<Record<'lg' | 'md', boolean>>): DeviceTier {
   if (screens.lg) return 'desktop';
   if (screens.md) return 'tablet';
   return 'mobile';
+}
+
+export function useDeviceTier(): DeviceTier {
+  return tierFor(Grid.useBreakpoint());
 }
