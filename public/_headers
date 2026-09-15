@@ -1,0 +1,29 @@
+# Cloudflare Pages custom headers.
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Vite fingerprints everything under /assets (content hash in the filename), so
+# it is safe to cache immutably forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Bundled vector tiles: large, rarely-changing, and re-fetched by range request.
+# Cache hard; MapLibre + pmtiles rely on HTTP range support, which Cloudflare
+# serves for static assets automatically.
+/tiles/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Access-Control-Allow-Origin: *
+
+# Downloadable shapefile bundles: cache a day, allow cross-origin fetch.
+/downloads/*
+  Cache-Control: public, max-age=86400
+  Access-Control-Allow-Origin: *
+
+# The HTML shell must never be cached stale, or users get an old bundle that
+# points at fingerprinted assets that have been purged.
+/index.html
+  Cache-Control: no-cache
+
+# Baseline security headers for the whole site.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

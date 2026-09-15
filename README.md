@@ -89,7 +89,55 @@ npx playwright test tests/render.spec.ts -g villages   # one layer
 
 First run needs the browser: `npx playwright install chromium`.
 
-## Directory model
+## Deploy (Cloudflare Pages + GitHub)
+
+The app is a static Vite SPA with the vector tiles and shapefile bundles
+committed under `public/`, so it deploys to Cloudflare Pages with no backend.
+Deployment uses Cloudflare's **Git integration**: every push to `main`
+auto-builds and deploys, and every pull request gets a preview URL.
+
+### Static config (in this repo, no setup needed)
+
+- `public/_redirects` — SPA fallback so `/map` and `/downloads` deep-links
+  resolve to `index.html` (client-side routing) instead of 404.
+- `public/_headers` — immutable cache for fingerprinted `/assets`, day-cache +
+  `Access-Control-Allow-Origin` for `/tiles` and `/downloads`, `no-cache` on
+  the HTML shell, and baseline security headers. (Cloudflare serves HTTP range
+  requests for the `.pmtiles` automatically — MapLibre relies on this.)
+- `wrangler.toml` — Pages project config (`pages_build_output_dir = "dist"`);
+  also enables a manual `npx wrangler pages deploy dist`.
+- `.github/workflows/ci.yml` — validation gate (typecheck, build, Playwright
+  tests) on push/PR. It does **not** deploy; Cloudflare owns that.
+
+### One-time setup (needs your accounts — not scriptable here)
+
+1. **Push to GitHub.** Create a repo and push `main`:
+   ```
+   git remote add origin git@github.com:<you>/chengalpattu-flood-gis.git
+   git push -u origin main
+   ```
+2. **Connect Cloudflare Pages.** In the Cloudflare dashboard →
+   *Workers & Pages* → *Create* → *Pages* → *Connect to Git* → pick the repo.
+3. **Build settings:**
+   - Framework preset: **Vite** (or *None*)
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Node version: `20` (set env var `NODE_VERSION=20` if needed)
+4. **Save and Deploy.** Cloudflare builds and serves at
+   `https://<project>.pages.dev`. Add a custom domain under the project's
+   *Custom domains* tab if you have one.
+
+After that, `git push` to `main` deploys automatically and PRs get preview
+URLs. No secrets are stored in the repo.
+
+### Manual deploy (optional)
+
+```
+npm run build
+npx wrangler pages deploy dist        # after `npx wrangler login`
+```
+
+
 
 ```
 data/source/       India-wide originals (cached, NOT shipped)

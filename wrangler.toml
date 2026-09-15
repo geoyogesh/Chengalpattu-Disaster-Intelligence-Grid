@@ -1,0 +1,15 @@
+# Cloudflare Pages configuration.
+# https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+#
+# With Git integration (the deploy path this repo uses), Cloudflare builds on
+# every push to `main` and creates preview deployments for pull requests — the
+# build command and output dir below mirror what you set in the Pages project
+# UI. This file also lets you deploy by hand with:
+#
+#     npm run build && npx wrangler pages deploy dist
+#
+# (requires `npx wrangler login` once, or CLOUDFLARE_API_TOKEN in the env).
+
+name = "chengalpattu-flood-gis"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "dist"
