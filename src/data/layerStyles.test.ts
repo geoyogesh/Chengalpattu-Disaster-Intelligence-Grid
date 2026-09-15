@@ -34,7 +34,9 @@ describe('LAYER_STYLES <-> GEO_LAYERS coverage', () => {
       };
       const spec = style.build(base, layer, 0.85);
       expect(spec.id).toBe(`geo-${layer.id}`);
-      expect(spec.source).toBe(`src-${layer.id}`);
+      // Every layer we build targets a vector source; `source` is absent only
+      // on the `background` variant of the union, which we never build.
+      expect((spec as { source?: string }).source).toBe(`src-${layer.id}`);
     }
   });
 });
