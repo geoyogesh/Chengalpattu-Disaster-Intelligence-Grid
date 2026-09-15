@@ -1,0 +1,8 @@
+{
+  "*": [
+    "any",
+    ["==", "road_type", "NATIONAL HIGHWAY"],
+    ["all", ["==", "road_type", "STATE HIGHWAY"], [">=", "$zoom", 10]],
+    [">=", "$zoom", 12]
+  ]
+}

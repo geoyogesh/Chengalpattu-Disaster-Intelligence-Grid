@@ -1,0 +1,47 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+/* ---- Map ---- */
+.map-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+
+/* Keep MapLibre's own controls (scale, attribution) clear of our overlays. */
+.maplibregl-ctrl-bottom-left {
+  margin-bottom: 4px;
+}
+
+/* ---- Hover popup (village names on hover) ---- */
+.hover-popup .maplibregl-popup-content {
+  background: #1a1f2b;
+  color: #e6ebf2;
+  border: 1px solid #262d3a;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.hover-popup .maplibregl-popup-tip {
+  border-top-color: #1a1f2b;
+  border-bottom-color: #1a1f2b;
+}

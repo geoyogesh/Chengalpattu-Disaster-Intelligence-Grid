@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Playwright
+test-results/
+playwright-report/
+.playwright/
+
+# TS build info
+*.tsbuildinfo
+
+# ---- Geodata pipeline ----
+# India-wide originals are large & re-downloadable: keep local, never commit.
+data/source/
+data/clipped/
+# Generated app artifacts (regenerate via scripts/build-geodata.sh).
+# Commit these if you want the deployed app self-contained without a build step;
+# ignore them if the CI/build runs the pipeline. Default: ship them.
+# public/tiles/
+# public/downloads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Design verification screenshots (throwaway evidence; regenerate via tests).
+# The mockup .html files ARE kept as the design spec.
+design/*.png
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Env
+.env
+.env.local
+.env.*.local

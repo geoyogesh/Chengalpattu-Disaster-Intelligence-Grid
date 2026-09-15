@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# layers.manifest - declarative source list for the Chengalpattu geodata pipeline.
+#
+# One record per line, pipe-delimited:
+#   id | geomType | pmtilesURL | vectorURL | vectorFormat | attribution | labelField
+#
+# - id            stable layer id (used for output filenames + app layer keys)
+# - geomType      fill | line | circle  (how MapLibre renders it)
+# - pmtilesURL    India-wide PMTiles release URL to bbox-extract, or "-" if none
+# - vectorURL     India-wide vector source (parquet/geojson) for the shapefile ZIP,
+#                 or "-" to derive the shapefile from the clipped PMTiles instead
+# - vectorFormat  parquet | geojson | "-"
+# - attribution   short human source string
+# - labelField    feature property to label; if set, a separate centroid POINT
+#                 layer <id>_labels.pmtiles is generated so each feature is
+#                 labelled exactly once (no per-tile repetition). "-" = no label.
+# - whereSql      optional OGR SQL WHERE filter applied to the vector source
+#                 before clipping (e.g. keep only one district's features).
+#                 "-" = no filter. Spaces allowed; do not use the '|' character.
+#
+# Data (c) yashveeeeeeer/india-geodata, CC-BY-4.0. Clipped to the Chengalpattu
+# district bounding box for offline flood-response use.
+#
+# Blank lines and lines starting with '#' are ignored.
+#
+# NOTE: the villages source (SOI_villages.parquet) is ~574 MB. The first build
+# downloads it into data/source/ (cached thereafter). It is village POLYGON
+# boundaries (not the smaller Census_Villages point set).
+
+district|fill|https://github.com/yashveeeeeeer/india-geodata/releases/download/census/2011/Districts_2011.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/census/2011/Districts_2011.parquet|parquet|LGD / Census 2011 districts|dtname|-
+subdistricts|fill|https://github.com/yashveeeeeeer/india-geodata/releases/download/admin/subdistricts/SOI_Subdistricts.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/admin/subdistricts/SOI_Subdistricts.parquet|parquet|Survey of India sub-districts (taluks)|TEHSIL|District = 'CHENGALPATTU'
+villages|fill|-|https://github.com/yashveeeeeeer/india-geodata/releases/download/admin/villages/SOI_villages.parquet|parquet|Survey of India village polygons|VILLAGE|DISTRICT = 'CHENGALPATTU'
+rivers|line|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/rivers/WRIS_Rivers.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/rivers/WRIS_Rivers.parquet|parquet|WRIS rivers|-
+waterbodies|fill|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/waterbodies/WRIS_Waterbodies.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/waterbodies/WRIS_Waterbodies.parquet|parquet|WRIS waterbodies (tanks/eris)|-
+tanks|fill|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/waterbodies/SOI_Tanks.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/waterbodies/SOI_Tanks.parquet|parquet|Survey of India tanks|-
+watersheds|fill|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/hydro-boundaries/WRIS_Watershed.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/water/hydro-boundaries/WRIS_Watershed.parquet|parquet|WRIS watersheds|-
+roads|line|https://github.com/yashveeeeeeer/india-geodata/releases/download/infra/soi-roads/SOI_Roads.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/infra/soi-roads/SOI_Roads.parquet|parquet|Survey of India roads|-
+railtracks|line|https://github.com/yashveeeeeeer/india-geodata/releases/download/infra/railways/IR_Tracks.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/infra/railways/IR_Tracks.parquet|parquet|Indian Railways tracks|-
+railstations|circle|https://github.com/yashveeeeeeer/india-geodata/releases/download/infra/railways/IR_Stations.pmtiles|https://github.com/yashveeeeeeer/india-geodata/releases/download/infra/railways/IR_Stations.parquet|parquet|Indian Railways stations|-
+healthcare|circle|-|https://github.com/yashveeeeeeer/india-geodata/releases/download/healthcare/facilities/INDIA_HEALTH_FACILITIES_NIC.geojson|geojson|NIC HealthGIS facilities|-
+education|circle|-|https://github.com/yashveeeeeeer/india-geodata/raw/main/data/education/facilities/INDIA_EDUCATION_FACILITIES_POINTS.geojson|geojson|OSM education facilities (shelters)|-

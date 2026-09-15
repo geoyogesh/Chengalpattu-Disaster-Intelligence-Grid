@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CDIG — UI/UX redesign options</title>
+<style>
+  /* Real tokens mirrored from the app: AntD darkAlgorithm + primary #1677ff,
+     flood palette from geoLayers (water #1677ff, rivers #13c2c2, health #f5222d,
+     school #52c41a, watershed #237804). */
+  :root {
+    --bg: #0b0d10;
+    --panel: #141821;
+    --panel-2: #1a1f2b;
+    --line: #262d3a;
+    --text: #e6ebf2;
+    --muted: #8b95a5;
+    --primary: #1677ff;
+    --water: #4dabf7;
+    --river: #13c2c2;
+    --danger: #f5222d;
+    --ok: #52c41a;
+    --warn: #ffa94d;
+    --radius: 8px;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #05070a; color: var(--text); font-family: var(--sans); }
+  h1 { font-size: 18px; margin: 24px 20px 4px; }
+  .sub { color: var(--muted); margin: 0 20px 20px; font-size: 13px; max-width: 900px; line-height: 1.5; }
+  .opt-label { margin: 28px 20px 8px; font-size: 14px; font-weight: 700; letter-spacing: .3px; }
+  .opt-note { margin: 0 20px 12px; color: var(--muted); font-size: 12.5px; max-width: 900px; line-height: 1.5; }
+  .frame { margin: 0 20px 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); }
+  .app { display: grid; height: 560px; }
+
+  /* faux map */
+  .map { position: relative; background:
+      radial-gradient(1200px 700px at 30% 40%, #10151c, #080a0e);
+    overflow: hidden; }
+  .map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .maptag { position:absolute; color: var(--muted); font-size: 11px; letter-spacing:.5px; }
+
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px;
+    font-size:12px; border:1px solid var(--line); background: rgba(20,24,33,.85); color:var(--text); }
+  .swatch { width:10px; height:10px; border-radius:2px; flex:0 0 auto; }
+  .swatch.line { height:3px; border-radius:2px; }
+  .swatch.dot { border-radius:50%; }
+  .btn { font-family:var(--sans); font-size:12px; color:var(--text); background:var(--panel-2);
+    border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; }
+  .btn.primary { background: var(--primary); border-color: var(--primary); color:#fff; font-weight:600; }
+  .switch { width:34px; height:18px; border-radius:999px; background:#39424f; position:relative; flex:0 0 auto; }
+  .switch.on { background: var(--primary); }
+  .switch::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%;
+    background:#fff; transition:.15s; }
+  .switch.on::after { left:18px; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .grp-title { font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--muted); }
+  .count { font-size:11px; color:var(--muted); }
+  .search { display:flex; align-items:center; gap:8px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:8px; padding:8px 10px; color:var(--muted); font-size:13px; }
+
+  /* ============ OPTION A — Ops console (dense left rail + edge-to-edge map) ============ */
+  .A .app { grid-template-columns: 56px 300px 1fr; }
+  .A .rail { background:#0e1218; border-right:1px solid var(--line); display:flex; flex-direction:column;
+    align-items:center; padding-top:12px; gap:6px; }
+  .A .rail .logo { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,var(--primary),#0d47a1);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; margin-bottom:8px; }
+  .A .rail .ic { width:38px; height:38px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:16px; }
+  .A .rail .ic.active { background:var(--panel-2); color:var(--primary); box-shadow: inset 2px 0 0 var(--primary); }
+  .A .side { background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column; }
+  .A .side header { padding:14px 16px 10px; border-bottom:1px solid var(--line); }
+  .A .side header .ttl { font-size:15px; font-weight:700; }
+  .A .side header .st { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .A .side .scroll { padding:12px 14px; overflow:auto; }
+  .A .grp { margin-bottom:14px; }
+  .A .grp .hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .A .lyr { display:flex; align-items:center; justify-content:space-between; padding:7px 8px; border-radius:7px; }
+  .A .lyr:hover { background:var(--panel-2); }
+  .A .lyr .lab { display:flex; align-items:center; gap:9px; font-size:13px; }
+  .A .mapwrap { position:relative; }
+  .A .topbar { position:absolute; top:12px; left:12px; right:12px; display:flex; gap:8px; align-items:center; z-index:3; }
+  .A .topbar .search { flex:1; }
+  .A .legend { position:absolute; left:12px; bottom:12px; z-index:3; background:rgba(14,18,24,.9);
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:6px; }
+  .A .legend .li { display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text); }
+  .A .zoom { position:absolute; top:12px; right:12px; z-index:3; display:flex; flex-direction:column;
+    border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .A .zoom button { width:34px; height:34px; background:var(--panel); color:var(--text); border:none;
+    border-bottom:1px solid var(--line); cursor:pointer; font-size:16px; }
+
+  /* ============ OPTION B — Floating glass panels over a full-bleed map ============ */
+  .B .app { grid-template-columns: 1fr; position:relative; }
+  .B .map { grid-column:1; }
+  .B .glass { position:absolute; background:rgba(16,20,28,.72); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,.09); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.45); }
+  .B .brand { top:16px; left:16px; padding:10px 14px; display:flex; align-items:center; gap:10px; z-index:4; }
+  .B .brand .logo { width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,var(--primary),#0d47a1);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff; }
+  .B .brand .t { font-size:14px; font-weight:700; } .B .brand .t small{display:block;color:var(--muted);font-weight:400;font-size:10.5px;}
+  .B .searchbar { top:16px; left:50%; transform:translateX(-50%); width:380px; padding:0; z-index:4; }
+  .B .searchbar .search { border:none; background:transparent; padding:11px 14px; }
+  .B .panel { top:16px; right:16px; width:290px; max-height:520px; display:flex; flex-direction:column; z-index:4; }
+  .B .panel header { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; justify-content:space-between; align-items:center;}
+  .B .panel .scroll { padding:10px 12px; overflow:auto; }
+  .B .chip { display:inline-flex; align-items:center; gap:6px; padding:5px 9px; margin:0 6px 6px 0; border-radius:999px;
+    font-size:12px; cursor:pointer; border:1px solid var(--line); background:var(--panel-2); color:var(--muted); }
+  .B .chip.on { color:#fff; border-color:transparent; }
+  .B .lyr { display:flex; align-items:center; justify-content:space-between; padding:6px 4px; font-size:13px; }
+  .B .lyr .lab{display:flex;align-items:center;gap:9px;}
+  .B .legend { bottom:16px; left:16px; padding:10px 12px; display:flex; gap:14px; z-index:4; }
+  .B .legend .li{display:flex;align-items:center;gap:7px;font-size:11.5px;}
+  .B .tabbar{bottom:16px; left:50%; transform:translateX(-50%); padding:5px; display:flex; gap:4px; z-index:4;}
+  .B .tabbar .tb{padding:7px 16px;border-radius:9px;font-size:12.5px;color:var(--muted);cursor:pointer;}
+  .B .tabbar .tb.on{background:var(--primary);color:#fff;font-weight:600;}
+
+  /* ============ OPTION C — Situation dashboard (stat header + map + contextual panel) ============ */
+  .C .app { grid-template-rows: auto 1fr; grid-template-columns: 300px 1fr; grid-template-areas: "hd hd" "side map"; }
+  .C .hd { grid-area:hd; background:linear-gradient(180deg,#121722,#0e131c); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:20px; padding:10px 18px; }
+  .C .hd .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),#0d47a1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;}
+  .C .hd .title{font-size:14px;font-weight:700;} .C .hd .title small{display:block;color:var(--muted);font-weight:400;font-size:10.5px;}
+  .C .hd .stats{display:flex;gap:14px;margin-left:auto;}
+  .C .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:7px 13px;min-width:78px;}
+  .C .stat b{display:block;font-size:16px;} .C .stat span{font-size:10.5px;color:var(--muted);}
+  .C .stat.alert b{color:var(--danger);}
+  .C .side{grid-area:side;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;}
+  .C .side .search{margin:12px;}
+  .C .side .scroll{padding:0 12px 12px;overflow:auto;}
+  .C .grp{margin-bottom:12px;} .C .grp .hd2{display:flex;justify-content:space-between;align-items:center;padding:6px 4px;border-radius:6px;cursor:pointer;}
+  .C .grp .hd2:hover{background:var(--panel-2);}
+  .C .lyr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px 14px;font-size:13px;}
+  .C .lyr .lab{display:flex;align-items:center;gap:9px;}
+  .C .map{grid-area:map;position:relative;}
+  .C .legend{position:absolute;right:12px;bottom:12px;background:rgba(14,18,24,.9);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
+  .C .legend .li{display:flex;align-items:center;gap:8px;font-size:11.5px;}
+
+  .caption{margin:8px 20px 0;color:var(--muted);font-size:12px;}
+  .rec{color:var(--ok);font-weight:600;}
+</style>
+</head>
+<body>
+  <h1>CDIG — three UI/UX directions</h1>
+  <p class="sub">All three use the app's real dark theme and layer palette (water #4dabf7, rivers #13c2c2, health #f5222d, schools #52c41a). The goal: make the <b>map the product</b>, add flood-responder essentials (search a place, a real legend, scale/context), and turn the flat toggle+slider list into a scannable control panel. Each option is a genuinely different layout, not a restyle of the same idea.</p>
+
+  <!-- reusable faux-map SVG snippet is inlined per option below -->
+
+  <!-- OPTION A -->
+  <div class="opt-label">Option A · “Ops console” — collapsible icon rail + dense layer sidebar + edge-to-edge map <span class="rec">(recommended)</span></div>
+  <p class="opt-note">Removes the triple-nested title chrome. A 56px icon rail replaces the wide sider; the map goes edge-to-edge with a floating search, zoom, and a real legend. Layer rows are compact (slider appears on hover / when a layer is on), grouped with counts. Reads like a professional GIS/ops tool. Densest information, most map area.</p>
+  <div class="frame A">
+    <div class="app">
+      <div class="rail">
+        <div class="logo">C</div>
+        <div class="ic active">🗺️</div>
+        <div class="ic">⬇️</div>
+        <div class="ic" style="margin-top:auto;margin-bottom:12px;">ⓘ</div>
+      </div>
+      <div class="side">
+        <header><div class="ttl">Layers</div><div class="st">Chengalpattu district · 12 layers</div></header>
+        <div class="scroll">
+          <div class="row" style="margin-bottom:10px;"><button class="btn primary">Show all</button><button class="btn">Hide all</button></div>
+          <div class="grp">
+            <div class="hd"><span class="grp-title">Flood &amp; Water</span><span class="count">2 on</span></div>
+            <div class="lyr"><span class="lab"><span class="swatch" style="background:#4dabf7"></span>Water bodies</span><span class="switch on"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch line" style="background:#13c2c2"></span>Rivers &amp; streams</span><span class="switch on"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch" style="background:#0958d9"></span>Tanks (SOI)</span><span class="switch"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch" style="background:#237804"></span>Watersheds</span><span class="switch"></span></div>
+          </div>
+          <div class="grp">
+            <div class="hd"><span class="grp-title">Response &amp; Relief</span><span class="count">0 on</span></div>
+            <div class="lyr"><span class="lab"><span class="swatch dot" style="background:#f5222d"></span>Healthcare facilities</span><span class="switch"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch dot" style="background:#52c41a"></span>Schools (shelters)</span><span class="switch"></span></div>
+          </div>
+          <div class="grp">
+            <div class="hd"><span class="grp-title">Access &amp; Evacuation</span><span class="count">0 on</span></div>
+            <div class="lyr"><span class="lab"><span class="swatch line" style="background:#e8590c"></span>Roads</span><span class="switch"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch line" style="background:#40404a"></span>Railways</span><span class="switch"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mapwrap map">
+        <svg viewBox="0 0 700 560" preserveAspectRatio="none">
+          <path d="M120,90 L260,70 340,120 300,220 360,320 300,430 160,410 90,300 130,190 Z" fill="none" stroke="#2b6cb0" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <path d="M300,110 C320,190 260,250 280,340 300,430" fill="none" stroke="#13c2c2" stroke-width="2"/>
+          <ellipse cx="200" cy="200" rx="34" ry="20" fill="#1f5f9e" opacity=".75"/>
+          <ellipse cx="250" cy="330" rx="26" ry="16" fill="#1f5f9e" opacity=".7"/>
+          <ellipse cx="150" cy="300" rx="20" ry="13" fill="#1f5f9e" opacity=".7"/>
+        </svg>
+        <div class="topbar">
+          <div class="search">🔍 Search a village, taluk or facility…</div>
+          <button class="btn">📍 Locate</button>
+        </div>
+        <div class="zoom"><button>+</button><button>−</button></div>
+        <div class="legend">
+          <div class="li"><span class="swatch" style="background:#4dabf7"></span>Water body</div>
+          <div class="li"><span class="swatch line" style="background:#13c2c2"></span>River</div>
+          <div class="li"><span class="swatch dot" style="background:#f5222d"></span>Hospital</div>
+          <div class="li"><span class="swatch dot" style="background:#52c41a"></span>Shelter</div>
+        </div>
+        <span class="maptag" style="left:14px;top:64px;">CHENGALPATTU</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="opt-label">Option B · “Floating glass” — full-bleed map, translucent panels float on top</div>
+  <p class="opt-note">The map fills the entire viewport; brand, search, layer panel and legend float as frosted-glass cards over it (Mapbox/Google-Maps feel). Layers toggle as chips + a compact list. Map/Downloads become a bottom pill toggle. Most immersive and modern, slightly less dense; panels can overlap the map on small screens.</p>
+  <div class="frame B">
+    <div class="app">
+      <div class="map">
+        <svg viewBox="0 0 1180 560" preserveAspectRatio="none">
+          <path d="M300,90 L560,70 700,140 640,280 720,400 620,500 360,470 240,340 300,200 Z" fill="none" stroke="#2b6cb0" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <path d="M600,110 C640,210 540,300 580,420 600,500" fill="none" stroke="#13c2c2" stroke-width="2"/>
+          <ellipse cx="420" cy="230" rx="46" ry="26" fill="#1f5f9e" opacity=".75"/>
+          <ellipse cx="520" cy="380" rx="34" ry="20" fill="#1f5f9e" opacity=".7"/>
+          <ellipse cx="330" cy="360" rx="26" ry="16" fill="#1f5f9e" opacity=".7"/>
+        </svg>
+        <div class="glass brand"><div class="logo">C</div><div class="t">CDIG<small>Chengalpattu flood response</small></div></div>
+        <div class="glass searchbar"><div class="search">🔍 Search a village, taluk or facility…</div></div>
+        <div class="glass panel">
+          <header><b style="font-size:14px;">Layers</b><span class="count">2 on · 12 total</span></header>
+          <div class="scroll">
+            <div>
+              <span class="chip on" style="background:#1f5f9e;">💧 Water</span>
+              <span class="chip on" style="background:#0f7d80;">🌊 Rivers</span>
+              <span class="chip">🏥 Health</span>
+              <span class="chip">🏫 Shelters</span>
+              <span class="chip">🛣️ Roads</span>
+            </div>
+            <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;">
+              <div class="lyr"><span class="lab"><span class="swatch" style="background:#4dabf7"></span>Water bodies</span><span class="switch on"></span></div>
+              <div class="lyr"><span class="lab"><span class="swatch line" style="background:#13c2c2"></span>Rivers &amp; streams</span><span class="switch on"></span></div>
+              <div class="lyr"><span class="lab"><span class="swatch" style="background:#0958d9"></span>Tanks (SOI)</span><span class="switch"></span></div>
+              <div class="lyr"><span class="lab"><span class="swatch dot" style="background:#f5222d"></span>Healthcare</span><span class="switch"></span></div>
+              <div class="lyr"><span class="lab"><span class="swatch dot" style="background:#52c41a"></span>Schools</span><span class="switch"></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="glass legend">
+          <div class="li"><span class="swatch" style="background:#4dabf7"></span>Water</div>
+          <div class="li"><span class="swatch line" style="background:#13c2c2"></span>River</div>
+          <div class="li"><span class="swatch dot" style="background:#f5222d"></span>Hospital</div>
+          <div class="li"><span class="swatch dot" style="background:#52c41a"></span>Shelter</div>
+        </div>
+        <div class="glass tabbar"><span class="tb on">Map</span><span class="tb">Downloads</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="opt-label">Option C · “Situation dashboard” — stat header band + grouped sidebar + map</div>
+  <p class="opt-note">Keeps a top band but makes it earn its space: brand on the left, live at-a-glance stats on the right (layers active, hospitals/shelters in view). Sidebar has search + accordion groups. Best if you later add live data (rainfall, alerts, incident counts); the header gives them a home. Most "command-center", uses a bit more chrome than A.</p>
+  <div class="frame C">
+    <div class="app">
+      <div class="hd">
+        <div class="logo">C</div>
+        <div class="title">Chengalpattu Disaster Intelligence Grid<small>Offline flood-response GIS</small></div>
+        <div class="stats">
+          <div class="stat"><b>2</b><span>Layers on</span></div>
+          <div class="stat"><b>38</b><span>Hospitals</span></div>
+          <div class="stat"><b>212</b><span>Shelters</span></div>
+          <div class="stat alert"><b>689</b><span>Villages</span></div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="search">🔍 Search a village, taluk…</div>
+        <div class="scroll">
+          <div class="grp">
+            <div class="hd2"><span class="grp-title">Flood &amp; Water</span><span class="count">2 on ▾</span></div>
+            <div class="lyr"><span class="lab"><span class="swatch" style="background:#4dabf7"></span>Water bodies</span><span class="switch on"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch line" style="background:#13c2c2"></span>Rivers &amp; streams</span><span class="switch on"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch" style="background:#0958d9"></span>Tanks (SOI)</span><span class="switch"></span></div>
+          </div>
+          <div class="grp">
+            <div class="hd2"><span class="grp-title">Response &amp; Relief</span><span class="count">0 on ▾</span></div>
+            <div class="lyr"><span class="lab"><span class="swatch dot" style="background:#f5222d"></span>Healthcare</span><span class="switch"></span></div>
+            <div class="lyr"><span class="lab"><span class="swatch dot" style="background:#52c41a"></span>Schools</span><span class="switch"></span></div>
+          </div>
+          <div class="grp">
+            <div class="hd2"><span class="grp-title">Reference ▸</span><span class="count">collapsed</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="map">
+        <svg viewBox="0 0 880 480" preserveAspectRatio="none">
+          <path d="M180,70 L420,60 540,110 500,220 560,320 460,410 240,390 140,270 190,160 Z" fill="none" stroke="#2b6cb0" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <path d="M460,90 C500,180 400,260 440,360 460,410" fill="none" stroke="#13c2c2" stroke-width="2"/>
+          <ellipse cx="300" cy="210" rx="42" ry="24" fill="#1f5f9e" opacity=".75"/>
+          <ellipse cx="390" cy="330" rx="30" ry="18" fill="#1f5f9e" opacity=".7"/>
+        </svg>
+        <div class="legend">
+          <div class="li"><span class="swatch" style="background:#4dabf7"></span>Water body</div>
+          <div class="li"><span class="swatch line" style="background:#13c2c2"></span>River</div>
+          <div class="li"><span class="swatch dot" style="background:#f5222d"></span>Hospital</div>
+          <div class="li"><span class="swatch dot" style="background:#52c41a"></span>Shelter</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption">Mockups are static HTML previews of layout &amp; hierarchy only — real map, fonts and AntD components render in the app. Emojis here stand in for the app's proper icon set (@ant-design/icons + the flat facility badges already built).</p>
+</body>
+</html>
