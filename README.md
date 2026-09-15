@@ -98,14 +98,13 @@ auto-builds and deploys, and every pull request gets a preview URL.
 
 ### Static config (in this repo, no setup needed)
 
-- `public/_redirects` — SPA fallback so `/map` and `/downloads` deep-links
-  resolve to `index.html` (client-side routing) instead of 404.
+- `wrangler.toml` — Workers static-assets config: serves `dist/` with
+  `not_found_handling = "single-page-application"`, so `/map` and `/downloads`
+  deep-links resolve to `index.html` instead of 404 (no Worker script needed).
 - `public/_headers` — immutable cache for fingerprinted `/assets`, day-cache +
   `Access-Control-Allow-Origin` for `/tiles` and `/downloads`, `no-cache` on
   the HTML shell, and baseline security headers. (Cloudflare serves HTTP range
   requests for the `.pmtiles` automatically — MapLibre relies on this.)
-- `wrangler.toml` — Pages project config (`pages_build_output_dir = "dist"`);
-  also enables a manual `npx wrangler pages deploy dist`.
 - `.github/workflows/ci.yml` — validation gate (typecheck, build, Playwright
   tests) on push/PR. It does **not** deploy; Cloudflare owns that.
 
@@ -134,7 +133,7 @@ URLs. No secrets are stored in the repo.
 
 ```
 npm run build
-npx wrangler pages deploy dist        # after `npx wrangler login`
+npx wrangler deploy                   # after `npx wrangler login`
 ```
 
 

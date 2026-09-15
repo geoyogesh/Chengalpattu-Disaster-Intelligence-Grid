@@ -1,6 +1,0 @@
-# Cloudflare Pages SPA fallback.
-# Client-side routing (react-router) owns /map and /downloads, so any path that
-# isn't a real file must serve index.html with a 200 (not a 404) and let the
-# router take over. Real assets under /assets, /tiles, /downloads are served
-# directly because they exist on disk and are matched before this catch-all.
-/*    /index.html   200
