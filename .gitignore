@@ -39,3 +39,6 @@ design/*.png
 .env
 .env.local
 .env.*.local
+
+# Wrangler local dev state
+.wrangler/

@@ -1,23 +1,29 @@
-# Cloudflare configuration.
+# Cloudflare Workers configuration.
 #
-# This repo is deployed via Cloudflare's Git integration. The connected project
-# was created as a **Workers** project (Workers Builds), which runs
-# `wrangler deploy` — so this is configured as a static-assets Worker: there is
-# NO Worker script (no `main`), just a static asset directory. Cloudflare serves
-# dist/ directly from its edge, and `single-page-application` handling makes
-# client-side routes (/map, /downloads) resolve to index.html instead of 404.
+# This is a Workers project (Workers Builds via Git integration). It serves the
+# built Vite SPA from dist/ AND runs a small Worker (worker/index.js) in front
+# of the static assets to implement HTTP range serving for the .pmtiles files.
 #
-# Static-asset-only deploys need no Worker code — `wrangler deploy` uploads the
-# assets directory and nothing else.
+# WHY THE WORKER: MapLibre + pmtiles.js read tiles by byte-RANGE from one large
+# .pmtiles archive. Cloudflare Workers static assets ignore the Range header and
+# return the whole file, so pmtiles fails and the map renders dark. The Worker
+# slices the requested range and returns 206 Partial Content; all other requests
+# defer to the ASSETS binding (which applies SPA not_found_handling).
 #
-# Docs: https://developers.cloudflare.com/workers/static-assets/
+# Docs: https://developers.cloudflare.com/workers/static-assets/binding/
 #
 # Manual deploy:  npm run build && npx wrangler deploy
 # (Git integration runs the project's build command then `wrangler deploy`.)
 
-name = "chengalpattu-flood-gis"
+name = "chengalpattu-disaster-intelligence-grid"
+main = "worker/index.js"
 compatibility_date = "2024-11-01"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "single-page-application"
+# Run the Worker BEFORE static-asset serving for tile paths, so it can slice
+# byte-ranges for .pmtiles (static assets alone ignore Range and 200 the whole
+# file). All other paths still hit static assets directly (fast path).
+run_worker_first = ["/tiles/*"]
