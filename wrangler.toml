@@ -1,15 +1,23 @@
-# Cloudflare Pages configuration.
-# https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+# Cloudflare configuration.
 #
-# With Git integration (the deploy path this repo uses), Cloudflare builds on
-# every push to `main` and creates preview deployments for pull requests — the
-# build command and output dir below mirror what you set in the Pages project
-# UI. This file also lets you deploy by hand with:
+# This repo is deployed via Cloudflare's Git integration. The connected project
+# was created as a **Workers** project (Workers Builds), which runs
+# `wrangler deploy` — so this is configured as a static-assets Worker: there is
+# NO Worker script (no `main`), just a static asset directory. Cloudflare serves
+# dist/ directly from its edge, and `single-page-application` handling makes
+# client-side routes (/map, /downloads) resolve to index.html instead of 404.
 #
-#     npm run build && npx wrangler pages deploy dist
+# Static-asset-only deploys need no Worker code — `wrangler deploy` uploads the
+# assets directory and nothing else.
 #
-# (requires `npx wrangler login` once, or CLOUDFLARE_API_TOKEN in the env).
+# Docs: https://developers.cloudflare.com/workers/static-assets/
+#
+# Manual deploy:  npm run build && npx wrangler deploy
+# (Git integration runs the project's build command then `wrangler deploy`.)
 
 name = "chengalpattu-flood-gis"
 compatibility_date = "2024-11-01"
-pages_build_output_dir = "dist"
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
