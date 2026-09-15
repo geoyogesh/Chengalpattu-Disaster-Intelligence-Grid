@@ -51,11 +51,17 @@ export interface LayerBase {
 }
 
 const iconSizeRamp: ExpressionSpecification = [
-  'interpolate', ['linear'], ['zoom'],
-  9, 0.16,
-  11, 0.24,
-  13, 0.45,
-  16, 0.9,
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  9,
+  0.16,
+  11,
+  0.24,
+  13,
+  0.45,
+  16,
+  0.9,
 ];
 
 /** Reused road class filter: NH/SH always, everything else only from z12. */
@@ -183,16 +189,24 @@ export const LAYER_STYLES: Record<string, LayerStyleDef> = {
       filter: roadClassFilter,
       paint: {
         'line-color': [
-          'match', ['get', 'road_type'],
-          'NATIONAL HIGHWAY', '#e8590c',
-          'STATE HIGHWAY', '#ffa94d',
+          'match',
+          ['get', 'road_type'],
+          'NATIONAL HIGHWAY',
+          '#e8590c',
+          'STATE HIGHWAY',
+          '#ffa94d',
           '#9a6a3a',
         ],
         'line-width': [
-          'interpolate', ['linear'], ['zoom'],
-          9, ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 1.8, 'STATE HIGHWAY', 1.2, 0.4],
-          13, ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 4, 'STATE HIGHWAY', 3, 1.2],
-          16, ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 7, 'STATE HIGHWAY', 6, 3],
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          9,
+          ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 1.8, 'STATE HIGHWAY', 1.2, 0.4],
+          13,
+          ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 4, 'STATE HIGHWAY', 3, 1.2],
+          16,
+          ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 7, 'STATE HIGHWAY', 6, 3],
         ],
         'line-opacity': ['interpolate', ['linear'], ['zoom'], 9, 0.55, 13, 0.95],
       },
@@ -209,10 +223,15 @@ export const LAYER_STYLES: Record<string, LayerStyleDef> = {
           paint: {
             'line-color': '#1a1a1a',
             'line-width': [
-              'interpolate', ['linear'], ['zoom'],
-              9, ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 3, 'STATE HIGHWAY', 2.2, 1],
-              13, ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 6, 'STATE HIGHWAY', 4.5, 2.2],
-              16, ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 9.5, 'STATE HIGHWAY', 8, 4.5],
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              9,
+              ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 3, 'STATE HIGHWAY', 2.2, 1],
+              13,
+              ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 6, 'STATE HIGHWAY', 4.5, 2.2],
+              16,
+              ['match', ['get', 'road_type'], 'NATIONAL HIGHWAY', 9.5, 'STATE HIGHWAY', 8, 4.5],
             ],
             'line-opacity': ['interpolate', ['linear'], ['zoom'], 9, 0.3, 13, 0.7],
           },
@@ -258,23 +277,30 @@ export const LAYER_STYLES: Record<string, LayerStyleDef> = {
     build: (base, _layer, opacity) => ({
       ...base,
       type: 'fill',
-      filter: [
-        '>=', areaHa,
-        ['interpolate', ['linear'], ['zoom'], 9, 50, 11, 10, 13, 2, 14, 0],
-      ],
+      filter: ['>=', areaHa, ['interpolate', ['linear'], ['zoom'], 9, 50, 11, 10, 13, 2, 14, 0]],
       paint: {
         'fill-color': [
-          'interpolate', ['linear'], areaHa,
-          0, '#3b6ea5',
-          25, '#2f7dd1',
-          100, '#1c6fd6',
-          400, '#0b5bc4',
+          'interpolate',
+          ['linear'],
+          areaHa,
+          0,
+          '#3b6ea5',
+          25,
+          '#2f7dd1',
+          100,
+          '#1c6fd6',
+          400,
+          '#0b5bc4',
         ],
         'fill-opacity': waterOpacity(opacity),
         'fill-outline-color': [
-          'interpolate', ['linear'], ['zoom'],
-          12, 'rgba(0,0,0,0)',
-          13.5, '#74c0fc',
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          12,
+          'rgba(0,0,0,0)',
+          13.5,
+          '#74c0fc',
         ],
       },
     }),
@@ -291,10 +317,15 @@ export const LAYER_STYLES: Record<string, LayerStyleDef> = {
       paint: {
         'line-color': ['case', riverIsMajor, '#3bc9db', '#2f9e9e'],
         'line-width': [
-          'interpolate', ['linear'], ['zoom'],
-          8, ['case', riverIsMajor, 1.6, 0.6],
-          12, ['case', riverIsMajor, 3.2, 1.2],
-          16, ['case', riverIsMajor, 6, 2.6],
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          8,
+          ['case', riverIsMajor, 1.6, 0.6],
+          12,
+          ['case', riverIsMajor, 3.2, 1.2],
+          16,
+          ['case', riverIsMajor, 6, 2.6],
         ],
         'line-opacity': riverOpacity(opacity),
       },
@@ -319,7 +350,11 @@ export function iconStyle(base: LayerBase, layer: GeoLayer): LayerSpecification 
 }
 
 /** Geometry default paint for layers with no dedicated LAYER_STYLES entry. */
-export function defaultStyle(base: LayerBase, layer: GeoLayer, opacity: number): LayerSpecification {
+export function defaultStyle(
+  base: LayerBase,
+  layer: GeoLayer,
+  opacity: number,
+): LayerSpecification {
   if (layer.geom === 'circle' && layer.icon) return iconStyle(base, layer);
   switch (layer.geom) {
     case 'fill':

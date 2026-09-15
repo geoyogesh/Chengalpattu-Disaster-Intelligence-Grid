@@ -65,7 +65,6 @@ export class MapView extends Component<MapViewProps> {
     map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
     map.on('error', (e) => {
-       
       console.error('[MapLibre error]', e.error?.message ?? e.error ?? e);
     });
 

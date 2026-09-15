@@ -92,5 +92,4 @@ export const useLayerStore = create<LayerState>((set) => ({
 
 // Expose the store to automated tests so they can drive layer state the same
 // way the UI does (rather than mutating the map imperatively).
-(window as unknown as { __layerStore?: typeof useLayerStore }).__layerStore =
-  useLayerStore;
+(window as unknown as { __layerStore?: typeof useLayerStore }).__layerStore = useLayerStore;

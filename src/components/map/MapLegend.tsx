@@ -43,7 +43,12 @@ export function MapLegend({ compact = false }: { compact?: boolean }) {
     <Typography.Text style={{ fontSize: 11.5 }}>{text}</Typography.Text>
   );
 
-  const renderEntry = (id: string, fallbackLabel: string, geom: 'fill' | 'line' | 'circle', color: string) => {
+  const renderEntry = (
+    id: string,
+    fallbackLabel: string,
+    geom: 'fill' | 'line' | 'circle',
+    color: string,
+  ) => {
     // Water bodies: a graduated size ramp (matches the area-based fill style).
     if (id === 'waterbodies') {
       return (
@@ -74,12 +79,22 @@ export function MapLegend({ compact = false }: { compact?: boolean }) {
           {label('Rivers & streams')}
           <Flex align="center" gap={10}>
             <Flex align="center" gap={5}>
-              <span aria-hidden style={{ width: 16, height: 3, borderRadius: 2, background: '#3bc9db' }} />
-              <Typography.Text type="secondary" style={{ fontSize: 10 }}>river</Typography.Text>
+              <span
+                aria-hidden
+                style={{ width: 16, height: 3, borderRadius: 2, background: '#3bc9db' }}
+              />
+              <Typography.Text type="secondary" style={{ fontSize: 10 }}>
+                river
+              </Typography.Text>
             </Flex>
             <Flex align="center" gap={5}>
-              <span aria-hidden style={{ width: 16, height: 2, borderRadius: 2, background: '#2f9e9e' }} />
-              <Typography.Text type="secondary" style={{ fontSize: 10 }}>stream</Typography.Text>
+              <span
+                aria-hidden
+                style={{ width: 16, height: 2, borderRadius: 2, background: '#2f9e9e' }}
+              />
+              <Typography.Text type="secondary" style={{ fontSize: 10 }}>
+                stream
+              </Typography.Text>
             </Flex>
           </Flex>
         </Flex>

@@ -26,7 +26,12 @@ export function DownloadsPage() {
               ESRI Shapefile bundles, clipped to Chengalpattu district.
             </Typography.Text>
           </div>
-          <Button type="primary" icon={<FileZipOutlined />} href={withBase(ALL_LAYERS_DOWNLOAD)} download>
+          <Button
+            type="primary"
+            icon={<FileZipOutlined />}
+            href={withBase(ALL_LAYERS_DOWNLOAD)}
+            download
+          >
             Download all layers
           </Button>
         </Flex>

@@ -1,7 +1,4 @@
-import maplibregl, {
-  type Map as MapLibreMap,
-  type StyleSpecification,
-} from 'maplibre-gl';
+import maplibregl, { type Map as MapLibreMap, type StyleSpecification } from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
 
 import { FLAT_ICONS, rasterizeIcon } from '@/components/map/makiIcons';

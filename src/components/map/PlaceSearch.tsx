@@ -41,12 +41,23 @@ function centroid(geom: GeoJSON.Geometry): [number, number] | null {
  * facilities). Selecting a result flies the map to it. This is the key
  * flood-responder affordance the old UI lacked: find a place fast.
  */
-export function PlaceSearch({ map, size = 'middle' }: { map: MapLibreMap | null; size?: 'middle' | 'large' }) {
+export function PlaceSearch({
+  map,
+  size = 'middle',
+}: {
+  map: MapLibreMap | null;
+  size?: 'middle' | 'large';
+}) {
   const [options, setOptions] = useState<Hit[]>([]);
 
   // Layer ids whose tiles carry useful searchable names.
   const searchLayers = useMemo(
-    () => GEO_LAYERS.filter((l) => ['villages', 'subdistricts', 'district', 'waterbodies', 'healthcare', 'education'].includes(l.id)),
+    () =>
+      GEO_LAYERS.filter((l) =>
+        ['villages', 'subdistricts', 'district', 'waterbodies', 'healthcare', 'education'].includes(
+          l.id,
+        ),
+      ),
     [],
   );
 
@@ -62,7 +73,9 @@ export function PlaceSearch({ map, size = 'middle' }: { map: MapLibreMap | null;
       const srcLayer = `src-${layer.id}`;
       let feats: GeoJSON.Feature[] = [];
       try {
-        feats = map.querySourceFeatures(srcLayer, { sourceLayer: layer.sourceLayer }) as unknown as GeoJSON.Feature[];
+        feats = map.querySourceFeatures(srcLayer, {
+          sourceLayer: layer.sourceLayer,
+        }) as unknown as GeoJSON.Feature[];
       } catch {
         continue;
       }

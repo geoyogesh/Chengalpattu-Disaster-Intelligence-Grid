@@ -1,4 +1,16 @@
-import { Badge, Button, Collapse, Flex, List, Slider, Space, Switch, Tooltip, Typography, theme } from 'antd';
+import {
+  Badge,
+  Button,
+  Collapse,
+  Flex,
+  List,
+  Slider,
+  Space,
+  Switch,
+  Tooltip,
+  Typography,
+  theme,
+} from 'antd';
 
 import { GEO_LAYERS, LAYER_GROUPS, type GeoLayer, type LayerGroupId } from '@/data/geoLayers';
 import { useLayerStore, ADMIN_GROUP_KEY, BASEMAP_KEY } from '@/store/layerStore';
@@ -47,7 +59,10 @@ export function LayerPanel() {
       <span>{opts.label}</span>
     );
     return (
-      <List.Item key={opts.key} style={{ padding: '8px 4px', display: 'block', borderBlockEnd: 'none' }}>
+      <List.Item
+        key={opts.key}
+        style={{ padding: '8px 4px', display: 'block', borderBlockEnd: 'none' }}
+      >
         <Flex align="center" justify="space-between" gap={8}>
           <Flex align="center" gap={9} style={{ minWidth: 0 }}>
             <LayerSwatch geom={opts.geom} color={opts.color} />
@@ -136,7 +151,12 @@ export function LayerPanel() {
         </Flex>
       ),
       children: (
-        <List size="small" split={false} dataSource={[0]} renderItem={() => <>{[...extras, ...rows]}</>} />
+        <List
+          size="small"
+          split={false}
+          dataSource={[0]}
+          renderItem={() => <>{[...extras, ...rows]}</>}
+        />
       ),
     };
   });
@@ -155,7 +175,13 @@ export function LayerPanel() {
       </Space>
 
       <div style={{ flex: '1 1 auto', overflow: 'auto', marginInline: -8 }}>
-        <Collapse defaultActiveKey={defaultOpen} size="small" bordered={false} ghost items={items} />
+        <Collapse
+          defaultActiveKey={defaultOpen}
+          size="small"
+          bordered={false}
+          ghost
+          items={items}
+        />
       </div>
 
       <Typography.Text type="secondary" style={{ fontSize: 11 }}>

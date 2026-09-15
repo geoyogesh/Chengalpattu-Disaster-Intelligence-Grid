@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { FloatButton, Tooltip, theme } from 'antd';
-import {
-  PlusOutlined,
-  MinusOutlined,
-  AimOutlined,
-  HomeOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined, MinusOutlined, AimOutlined, HomeOutlined } from '@ant-design/icons';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 
 import { CHENGALPATTU_CENTER, CHENGALPATTU_ZOOM } from '@/data/geoLayers';
@@ -50,7 +45,12 @@ export function MapControls({ map }: { map: MapLibreMap | null }) {
       </Tooltip>
       <Tooltip title="Locate me" placement="left">
         <FloatButton
-          icon={<AimOutlined spin={locating} style={{ color: locating ? token.colorPrimary : undefined }} />}
+          icon={
+            <AimOutlined
+              spin={locating}
+              style={{ color: locating ? token.colorPrimary : undefined }}
+            />
+          }
           onClick={locate}
         />
       </Tooltip>

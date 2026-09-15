@@ -42,7 +42,15 @@ export function DashboardPage() {
 
       {/* Desktop/tablet: floating search top-left of the map. */}
       {tier !== 'mobile' && (
-        <div style={{ position: 'absolute', top: 12, insetInlineStart: 12, width: 360, maxWidth: '45%' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 12,
+            insetInlineStart: 12,
+            width: 360,
+            maxWidth: '45%',
+          }}
+        >
           <PlaceSearch map={map} />
         </div>
       )}
