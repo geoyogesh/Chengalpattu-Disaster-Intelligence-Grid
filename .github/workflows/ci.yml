@@ -1,9 +1,10 @@
 name: CI
 
-# Validation gate. Cloudflare Pages (Git integration) owns build + deploy on
-# every push to main and creates preview deployments for PRs — so this workflow
-# does NOT deploy. It runs the typecheck, build and Playwright render/UI tests
-# so a red check warns you before a broken bundle ships to Cloudflare.
+# Validation gate. Cloudflare (Workers Builds via Git integration) owns build +
+# deploy on every push to main and creates preview deployments for PRs — so this
+# workflow does NOT deploy. It runs typecheck, build, the tile-invariant check
+# and the Playwright render/UI tests so a red check warns before a broken bundle
+# ships to Cloudflare.
 
 on:
   push:
@@ -27,6 +28,15 @@ jobs:
 
       - name: Typecheck & build
         run: npm run build
+
+      - name: Install pmtiles CLI
+        run: |
+          curl -sL https://github.com/protomaps/go-pmtiles/releases/download/v1.22.3/go-pmtiles_1.22.3_Linux_x86_64.tar.gz \
+            | tar -xz pmtiles
+          sudo mv pmtiles /usr/local/bin/
+
+      - name: Verify tile sourceLayer invariant
+        run: npm run verify:tiles
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium

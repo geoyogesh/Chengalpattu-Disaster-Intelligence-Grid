@@ -2,13 +2,22 @@ import { create } from 'zustand';
 
 import { GEO_LAYERS } from '@/data/geoLayers';
 
+/**
+ * Named pseudo-keys for controls that are NOT registry layers: the OSM raster
+ * basemap and the "admin boundaries" group (district+taluks share one toggle).
+ * Exported so components reference these instead of bare string literals — a
+ * typo becomes a compile error rather than a silently ignored toggle.
+ */
+export const BASEMAP_KEY = 'osm' as const;
+export const ADMIN_GROUP_KEY = 'admin' as const;
+
 interface LayerUIState {
   visible: boolean;
   opacity: number;
 }
 
 interface LayerState {
-  /** Per-layer UI state, plus the 'osm' basemap and 'admin' group pseudo-keys. */
+  /** Per-layer UI state, plus the basemap + admin-group pseudo-keys. */
   layers: Record<string, LayerUIState>;
   toggleLayer: (id: string, visible?: boolean) => void;
   setOpacity: (id: string, opacity: number) => void;
@@ -16,15 +25,15 @@ interface LayerState {
   hideAll: () => void;
 }
 
-// Admin-group members share one panel toggle ('admin'); which one draws is
-// decided by zoom in MapView. Everything else is OFF by default so the app
+// Admin-group members share one panel toggle (ADMIN_GROUP_KEY); which one draws
+// is decided by zoom in MapView. Everything else is OFF by default so the app
 // opens showing only administrative boundaries.
 const adminIds = GEO_LAYERS.filter((l) => l.adminGroup).map((l) => l.id);
 
 const initialLayers: Record<string, LayerUIState> = {
-  osm: { visible: false, opacity: 1 },
+  [BASEMAP_KEY]: { visible: false, opacity: 1 },
   // The admin group starts ON.
-  admin: { visible: true, opacity: 0.85 },
+  [ADMIN_GROUP_KEY]: { visible: true, opacity: 0.85 },
   ...Object.fromEntries(
     GEO_LAYERS.map((l) => [
       l.id,
@@ -44,7 +53,7 @@ export const useLayerStore = create<LayerState>((set) => ({
       const next = { ...current, visible: visible ?? !current.visible };
       const updated = { ...state.layers, [id]: next };
       // Toggling the 'admin' group flips both admin member layers together.
-      if (id === 'admin') {
+      if (id === ADMIN_GROUP_KEY) {
         for (const memberId of adminIds) {
           if (updated[memberId]) {
             updated[memberId] = { ...updated[memberId], visible: next.visible };
@@ -58,7 +67,7 @@ export const useLayerStore = create<LayerState>((set) => ({
       const current = state.layers[id];
       if (!current) return state;
       const updated = { ...state.layers, [id]: { ...current, opacity } };
-      if (id === 'admin') {
+      if (id === ADMIN_GROUP_KEY) {
         for (const memberId of adminIds) {
           if (updated[memberId]) {
             updated[memberId] = { ...updated[memberId], opacity };

@@ -1,7 +1,7 @@
 import { Badge, Button, Collapse, Flex, List, Slider, Space, Switch, Tooltip, Typography, theme } from 'antd';
 
 import { GEO_LAYERS, LAYER_GROUPS, type GeoLayer, type LayerGroupId } from '@/data/geoLayers';
-import { useLayerStore } from '@/store/layerStore';
+import { useLayerStore, ADMIN_GROUP_KEY, BASEMAP_KEY } from '@/store/layerStore';
 import { LayerSwatch } from './LayerSwatch';
 
 /**
@@ -95,7 +95,7 @@ export function LayerPanel() {
       group.id === 'reference'
         ? [
             renderRow({
-              key: 'admin',
+              key: ADMIN_GROUP_KEY,
               label: 'Admin boundaries',
               geom: 'line',
               color: '#40a9ff',
@@ -103,7 +103,7 @@ export function LayerPanel() {
               ariaLabel: 'Toggle admin boundaries',
             }),
             renderRow({
-              key: 'osm',
+              key: BASEMAP_KEY,
               label: 'Basemap (OpenStreetMap)',
               geom: 'fill',
               color: '#a3b18a',
@@ -116,7 +116,7 @@ export function LayerPanel() {
     // Count how many controls in this group are currently on.
     const keys = [
       ...groupLayers.map((l) => l.id),
-      ...(group.id === 'reference' ? ['admin', 'osm'] : []),
+      ...(group.id === 'reference' ? [ADMIN_GROUP_KEY, BASEMAP_KEY] : []),
     ];
     const onCount = keys.filter((k) => layers[k]?.visible).length;
 
